@@ -1,0 +1,38 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.mainPage {
+    display: block;
+    margin: auto;
+    text-align: center;
+}
+
+.centerText {
+    margin-top: 20px;
+    display: block;
+    text-align: center;
+}
+
+.error {
+    color: red;
+}
+
+input {
+    margin: 10px;
+}
+
+footer {
+    position: fixed;
+    bottom: 10px;
+    margin: auto;
+    left: 0;
+    right: 0;
+}
+
+.logoutBtn {
+    display: block;
+    margin: auto;
+}
