@@ -25,20 +25,3 @@ async function login() {
         }
     }
 }
-
-// function register() {
-//     console.log("register");
-// const nameInput = document.getElementById("name").value;
-    // const emailInput = document.getElementById('email').value;
-    // const passwordInput = document.getElementById("password").value;
-//     if(emailInput === '' || passwordInput === '' || nameInput === '') {
-//         errorMessageRegisterDiv.textContent = "Please make sure to enter name, email and password.";
-//     }
-//     else {
-//         errorMessageRegisterDiv.textContent = '';
-//     }
-// }
-
-function logout() {
-    console.log("logout");
-}
