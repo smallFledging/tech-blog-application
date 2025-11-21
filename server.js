@@ -3,6 +3,7 @@ import path from "path";
 const __dirname = path.resolve();
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
 const SECRET_KEY = process.env.SECRET_KEY;
 import mysql from "mysql2/promise";
 
@@ -18,19 +19,22 @@ const connection = await mysql.createConnection({
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
+app.use(cookieParser())
 
 const PORT = 3001;
 
 // Middleware for authenticating JWT tokens
 const authenticateJWT = (req, res, next) => {
-  const token = req.header("Authorization");
-  if (!token) return res.status(403).json({ message: "Access Denied" });
+  const authCookie = req.cookies['authcookie'];
+  if (authCookie == null) return res.status(403).json({ message: "Access Denied" });
 
-  jwt.verify(token.split(" ")[1], SECRET_KEY, (err, user) => {
-    if (err) return res.status(403).json({ message: "Invalid Token" });
-    req.user = user;
-    next();
-  });
+  else {
+    jwt.verify(authCookie, SECRET_KEY, (err, user) => {
+        if(err) return res.status(403).json({message: "Invalid Token"});
+        req.user = user;
+        next();
+    })
+  }
 };
 
 
@@ -64,8 +68,6 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   const {email, password} = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  console.log("email", email, "password", hashedPassword);
 
       try {
         const [rows] = await connection.execute('SELECT * FROM user WHERE email = ?', [email]);
@@ -79,11 +81,13 @@ app.post('/login', async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
+        
         const token = jwt.sign(
-          { id: user.id, username: user.username },
+          { id: user.id, username: user.name },
           SECRET_KEY,
           { expiresIn: "1h" }
         );
+        res.cookie('authcookie',token,{maxAge:900000,httpOnly:true});
         res.json({ token });
 
       } catch (error) {
@@ -92,6 +96,15 @@ app.post('/login', async (req, res) => {
 
 
   return res.json({message: 'Success!'})
+});
+
+app.post('/categories', async (res) => {
+    try {
+      const [rows] = await connection.execute('SELECT * FROM category');
+      return res.status(200).json({rows});
+    } catch(error) {
+      res.status(401).json({message: "Error"})
+    }
 });
 
 app.get('/protected', authenticateJWT, async (req, res) => {

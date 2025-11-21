@@ -25,6 +25,11 @@ input {
     margin: 10px;
 }
 
+.popup {
+    display: block;
+    text-align: center;
+}
+
 footer {
     position: fixed;
     bottom: 10px;
